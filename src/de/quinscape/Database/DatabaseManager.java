@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class DatabaseManager {
     public void runProgram() throws IOException, ClassNotFoundException {
         ArrayListToObjectFileConverter clientList = new ArrayListToObjectFileConverter();
-        ObjectFileToArrayListConverter clientReader = new ObjectFileToArrayListConverter();
+        ObjectFileToArrayListConverter objectToArrayList = new ObjectFileToArrayListConverter();
         Client testClient = new Client();
 
 
@@ -18,7 +18,7 @@ public class DatabaseManager {
         clientList.convertArrayListToFile();
 
         //Reads .dat File with the saved ArrayList
-        ArrayList<Client> importedClientList = clientReader.importClientArrayListFile();
+        ArrayList<Client> importedClientList = objectToArrayList.importClientArrayListFile();
 
         //Uses the .dat file as an ArrayList to append new Clients
         appendNewClient(testClient, importedClientList);
@@ -32,6 +32,7 @@ public class DatabaseManager {
         testClient.setInsuranceNumber(1234);
         importedClientList.add(testClient);
         printContent(importedClientList);
+        System.out.println(importedClientList);
     }
 
     private void printContent(ArrayList<Client> importedClientList) {
