@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class DatabaseManager {
+    static ArrayList<Client> importedClientList = new ArrayList<>();
     public void runProgram() throws IOException, ClassNotFoundException {
         ArrayListToObjectFileConverter clientList = new ArrayListToObjectFileConverter();
-        ObjectFileToArrayListConverter clientReader = new ObjectFileToArrayListConverter();
+        ObjectFileToArrayListConverter objectToArrayList = new ObjectFileToArrayListConverter();
         Client testClient = new Client();
 
 
@@ -18,20 +19,24 @@ public class DatabaseManager {
         clientList.convertArrayListToFile();
 
         //Reads .dat File with the saved ArrayList
-        ArrayList<Client> importedClientList = clientReader.importClientArrayListFile();
+        importedClientList = objectToArrayList.importClientArrayListFile();
 
         //Uses the .dat file as an ArrayList to append new Clients
-        appendNewClient(testClient, importedClientList);
+        appendNewClient(testClient);
             //how do i close the ObjectFileToArrayListConverter - The OutputStreams are not closed
+
+        //TODO: Saving/Overwriting loaded .dat File / Datahase file with the "new" ArrayList
+        //FIXME: -> convert into File again and overwrite Client_Database.dat
 
     }
     
     //Test data
-    private void appendNewClient(Client testClient, ArrayList<Client> importedClientList) {
+    private void appendNewClient(Client testClient) {
         testClient.setName("Patrick");
         testClient.setInsuranceNumber(1234);
         importedClientList.add(testClient);
         printContent(importedClientList);
+        System.out.println(importedClientList);
     }
 
     private void printContent(ArrayList<Client> importedClientList) {

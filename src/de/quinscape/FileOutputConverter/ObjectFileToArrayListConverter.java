@@ -6,7 +6,6 @@ import de.quinscape.Model.Client;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ObjectFileToArrayListConverter {
@@ -16,7 +15,7 @@ public class ObjectFileToArrayListConverter {
     }
 
     public ArrayList<Client> importClientArrayListFile() throws IOException, ClassNotFoundException {
-        ArrayList<Client> clientList = (ArrayList) getClientDatabaseFile("Client_Database.dat").readObject();
+        ArrayList clientList = (ArrayList) getClientDatabaseFile("Client_Database.dat").readObject();
         return clientList;
     }
 }
