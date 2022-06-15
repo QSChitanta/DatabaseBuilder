@@ -31,6 +31,10 @@ public class DatabaseManager {
     }
     
     //Test data
+    /**
+     * appends Client to Array
+     * @param testClient
+     */
     private void appendNewClient(Client testClient) {
         testClient.setName("Patrick");
         testClient.setInsuranceNumber(1234);
