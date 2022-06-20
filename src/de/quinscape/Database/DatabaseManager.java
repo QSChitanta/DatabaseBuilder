@@ -72,20 +72,6 @@ public class DatabaseManager {
     }
 
     /**
-     * creates a new Client object and adds it to the list of clients
-     */
-    public void appendNewClientToList() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter clients name: ");
-        client.setName(sc.nextLine());
-        System.out.println("Enter clients insurance number: ");
-        client.setInsuranceNumber(sc.nextInt());
-        System.out.println("Client " + client.getName() + " successfully added to database.");
-        importedClientList.add(client);
-
-    }
-
-    /**
      * opens the saved ArrayList from the File a
      *
      * @param objectFileToArrayListConverter
@@ -96,29 +82,6 @@ public class DatabaseManager {
         importedClientList = objectFileToArrayListConverter.importClientArrayListFile();
     }
 
-    /**
-     * saves the importedClientList as a .dat file
-     *
-     * @throws IOException
-     */
-    public void serializeClientList() throws IOException {
-        FileOutputStream file = new FileOutputStream(databaseFile);
-        ObjectOutputStream newFile = new ObjectOutputStream(file);
-        newFile.writeObject(importedClientList);
-        newFile.close();
-        file.close();
-    }
-
-    /**
-     * prints every element from list
-     */
-    public void printContent() {
-        for (Client client : importedClientList){
-            System.out.println("Client-name: " + client.getName() + "\n" + "Client-insurance-number: " + client.getInsuranceNumber());
-        }
-        showEntryAmount();
-    }
-
     public void chooseYourOption() {
         int option = 0;
         while (option != 7) {
@@ -127,7 +90,7 @@ public class DatabaseManager {
                 option = scanner.nextInt();
                 switch (option) {
                     case 1:
-                        printContent();
+                        showAllClients();
                         break;
                     case 2:
                         selectAndShowClient();
@@ -150,8 +113,64 @@ public class DatabaseManager {
                 }
             } catch (InputMismatchException i) {
                 System.out.println("Please enter an integer value between 1 and " + OPTIONS.length + " + Error Message: " + i.getMessage());
+                scanner.next();
             } catch (Exception e) {
                 System.out.println("Unexpected error. Please try again" + " + Error Message: " + e.getMessage());
+                scanner.next();
+            }
+        }
+    }
+
+    public static void printMenu() {
+        for (String option : menu.printMenuOptions()) {
+            System.out.println(option);
+        }
+        System.out.println("Choose your option: ");
+    }
+
+    /**
+     * prints every element from list
+     */
+    public void showAllClients() {
+        for (Client client : importedClientList){
+            System.out.println("Client-name: " + client.getName() + "\n" + "Client-insurance-number: " + client.getInsuranceNumber());
+        }
+        showEntryAmount();
+    }
+
+    private void selectAndShowClient() {
+        System.out.println("Who are you looking for?: ");
+        Scanner userInput = new Scanner(System.in);
+        String check = userInput.nextLine();
+        for (Client client : importedClientList){
+            if (check.equals(client.getName())){
+                System.out.println("Client-name: " + client.getName() + "\n" +
+                        "Client-insurance-number: " + client.getInsuranceNumber());
+            }
+        }
+    }
+
+    /**
+     * creates a new Client object and adds it to the list of clients
+     */
+    public void appendNewClientToList() {
+        Scanner userInput = new Scanner(System.in);
+        System.out.println("Enter clients name: ");
+        client.setName(userInput.nextLine());
+        System.out.println("Enter clients insurance number: ");
+        client.setInsuranceNumber(userInput.nextInt());
+        importedClientList.add(client);
+    }
+
+    private void updateClient() {
+        System.out.println("Whose information do you want to update? Enter name please: ");
+        Scanner sc = new Scanner(System.in);
+        String searchForThisName = sc.nextLine();
+        for (Client client : importedClientList) {
+            if (Objects.equals(searchForThisName, client.getName())) {
+                System.out.println("Enter clients new name: ");
+                client.setName(sc.nextLine());
+                System.out.println("New name is now: " + client.getName());
             }
         }
     }
@@ -173,35 +192,17 @@ public class DatabaseManager {
         System.out.println("All clients have been deleted");
     }
 
-    private void selectAndShowClient() {
-        System.out.println("Who are you looking for?: ");
-        Scanner userInput = new Scanner(System.in);
-        String check = userInput.nextLine();
-        for (Client client : importedClientList){
-            if (check.equals(client.getName())){
-                System.out.println("Client-name: " + client.getName() + "\n" +
-                        "Client-insurance-number: " + client.getInsuranceNumber());
-            }
-        }
-    }
 
-    private void updateClient() {
-        System.out.println("Whose information do you want to update? Enter name please: ");
-        Scanner sc = new Scanner(System.in);
-        String searchForThisName = sc.nextLine();
-        for (Client client : importedClientList) {
-            if (Objects.equals(searchForThisName, client.getName())) {
-                System.out.println("Enter clients new name: ");
-                client.setName(sc.nextLine());
-                System.out.println("New name is now: " + client.getName());
-            }
-        }
-    }
-
-    public static void printMenu() {
-        for (String option : menu.printMenuOptions()) {
-            System.out.println(option);
-        }
-        System.out.println("Choose your option: ");
+    /**
+     * saves the importedClientList as a .dat file
+     *
+     * @throws IOException
+     */
+    public void serializeClientList() throws IOException {
+        FileOutputStream file = new FileOutputStream(databaseFile);
+        ObjectOutputStream newFile = new ObjectOutputStream(file);
+        newFile.writeObject(importedClientList);
+        newFile.close();
+        file.close();
     }
 }
