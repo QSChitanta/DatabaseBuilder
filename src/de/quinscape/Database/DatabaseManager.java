@@ -21,7 +21,7 @@ import java.util.Scanner;
 public class DatabaseManager {
     public ArrayList<Client> importedClientList = new ArrayList<>();
     private final File databaseFile = new File("Client_Database.dat");
-    private Client client = new Client();
+    private static Client client = new Client();
     static Scanner scanner = new Scanner(System.in);
     static Menu menu = new Menu();
     static String[] OPTIONS = {
