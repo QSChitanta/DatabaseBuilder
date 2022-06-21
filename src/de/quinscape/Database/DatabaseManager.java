@@ -21,7 +21,6 @@ import java.util.Scanner;
 public class DatabaseManager {
     public ArrayList<Client> importedClientList = new ArrayList<>();
     private final File databaseFile = new File("Client_Database.dat");
-    private static Client client = new Client();
     static Scanner scanner = new Scanner(System.in);
     static Menu menu = new Menu();
     static String[] OPTIONS = {
@@ -154,31 +153,37 @@ public class DatabaseManager {
      * creates a new Client object and adds it to the list of clients
      */
     public void appendNewClientToList() {
+        Client client = new Client();
         Scanner userInput = new Scanner(System.in);
         System.out.println("Enter clients name: ");
         client.setName(userInput.nextLine());
         System.out.println("Enter clients insurance number: ");
         client.setInsuranceNumber(userInput.nextInt());
+//        try {
+//            System.out.println(importedClientList.get(0).getName() + " checkpoint!!");
+//        } catch (Exception e){
+//            System.out.println(e.getMessage());
+//        }
         importedClientList.add(client);
     }
 
     private void updateClient() {
         System.out.println("Whose information do you want to update? Enter name please: ");
-        Scanner sc = new Scanner(System.in);
-        String searchForThisName = sc.nextLine();
+        Scanner userInput = new Scanner(System.in);
+        String searchForThisName = userInput.nextLine();
         for (Client client : importedClientList) {
             if (Objects.equals(searchForThisName, client.getName())) {
                 System.out.println("Enter clients new name: ");
-                client.setName(sc.nextLine());
+                client.setName(userInput.nextLine());
                 System.out.println("New name is now: " + client.getName());
             }
         }
     }
-
+    //throws exception after deleting client,
     private void deleteClient() {
         System.out.println("Enter name to delete client: ");
-        Scanner sc = new Scanner(System.in);
-        String clientToBeDeleted = sc.nextLine();
+        Scanner userInput = new Scanner(System.in);
+        String clientToBeDeleted = userInput.nextLine();
         for (Client client : importedClientList) {
             if (Objects.equals(clientToBeDeleted, client.getName())) {
                 importedClientList.remove(client);
