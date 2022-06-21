@@ -34,20 +34,8 @@ public class DatabaseManager {
 
     public void runProgram() throws IOException, ClassNotFoundException {
         createOrReadFile();
-
-        //append new clients to the now opened list: Before appendNewClientToList();
         chooseYourOption();
-
-        //save the list as an object inside a file and close the file.
         serializeClientList();
-    }
-
-    private void showEntryAmount() {
-        int count = 0;
-        for (int i = 0; i < importedClientList.size(); i++) {
-            count++;
-        }
-        System.out.println("You have " + count + " entries");
     }
 
     /**
@@ -95,7 +83,7 @@ public class DatabaseManager {
                         selectAndShowClient();
                         break;
                     case 3:
-                        appendNewClientToList();
+                        addNewClientToList();
                         break;
                     case 4:
                         updateClient();
@@ -104,7 +92,7 @@ public class DatabaseManager {
                         deleteClient();
                         break;
                     case 6:
-                        removeAllClients();
+                        deleteAllClients();
                         break;
                     case 7:
                         System.out.println("Exiting...");
@@ -137,10 +125,19 @@ public class DatabaseManager {
         showEntryAmount();
     }
 
+    private void showEntryAmount() {
+        int count = 0;
+        for (int i = 0; i < importedClientList.size(); i++) {
+            count++;
+        }
+        System.out.println("You have " + count + " entries");
+    }
+
     private void selectAndShowClient() {
         System.out.println("Who are you looking for?: ");
         Scanner userInput = new Scanner(System.in);
         String check = userInput.nextLine();
+        //TODO: diese for schleife in einer simpleren Form nachbauen
         for (Client client : importedClientList){
             if (check.equals(client.getName())){
                 System.out.println("Client-name: " + client.getName() + "\n" +
@@ -152,7 +149,7 @@ public class DatabaseManager {
     /**
      * creates a new Client object and adds it to the list of clients
      */
-    public void appendNewClientToList() {
+    public void addNewClientToList() {
         Client client = new Client();
         Scanner userInput = new Scanner(System.in);
         System.out.println("Enter clients name: ");
@@ -192,11 +189,10 @@ public class DatabaseManager {
         }
     }
 
-    private void removeAllClients(){
+    private void deleteAllClients(){
         importedClientList.removeAll(importedClientList);
         System.out.println("All clients have been deleted");
     }
-
 
     /**
      * saves the importedClientList as a .dat file

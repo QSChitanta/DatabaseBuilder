@@ -1,13 +1,6 @@
 package de.quinscape.NavigationMenu;
 
-import de.quinscape.Database.DatabaseManager;
-import de.quinscape.Model.Client;
-
-import javax.xml.crypto.Data;
-import java.util.Scanner;
-
 public class Menu {
-    DatabaseManager db = new DatabaseManager();
     public String[] printMenuOptions(){
         return new String[]{
                 "1- Show all clients",
