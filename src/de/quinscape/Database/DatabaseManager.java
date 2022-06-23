@@ -102,8 +102,7 @@ public class DatabaseManager {
                 System.out.println("Please enter an integer value between 1 and " + OPTIONS.length + " + Error Message: " + i.getMessage());
                 scanner.next();
             } catch (Exception e) {
-                System.out.println("Unexpected error. Please try again" + " + Error Message: " + e.getMessage());
-                scanner.next();
+                System.out.println("Unexpected error. Please try again" + " + Error Message: " + e.getMessage() + ". Enter something to continue");
             }
         }
     }
@@ -156,11 +155,6 @@ public class DatabaseManager {
         client.setName(userInput.nextLine());
         System.out.println("Enter clients insurance number: ");
         client.setInsuranceNumber(userInput.nextInt());
-//        try {
-//            System.out.println(importedClientList.get(0).getName() + " checkpoint!!");
-//        } catch (Exception e){
-//            System.out.println(e.getMessage());
-//        }
         importedClientList.add(client);
     }
 
@@ -169,22 +163,30 @@ public class DatabaseManager {
         Scanner userInput = new Scanner(System.in);
         String searchForThisName = userInput.nextLine();
         for (Client client : importedClientList) {
-            if (Objects.equals(searchForThisName, client.getName())) {
+            if (searchForThisName.equals(client.getName())) {
                 System.out.println("Enter clients new name: ");
                 client.setName(userInput.nextLine());
+                System.out.println("Enter clients insurance number");
+                client.setInsuranceNumber(userInput.nextInt());
                 System.out.println("New name is now: " + client.getName());
             }
         }
     }
-    //throws exception after deleting client,
+
     private void deleteClient() {
         System.out.println("Enter name to delete client: ");
+
         Scanner userInput = new Scanner(System.in);
         String clientToBeDeleted = userInput.nextLine();
+
         for (Client client : importedClientList) {
-            if (Objects.equals(clientToBeDeleted, client.getName())) {
+            if (clientToBeDeleted.equals(client.getName())) {
                 importedClientList.remove(client);
                 System.out.println("Client has been deleted");
+                if (importedClientList.isEmpty()){
+                    System.out.println("Client list is now empty.");
+                    break;
+                }
             }
         }
     }
