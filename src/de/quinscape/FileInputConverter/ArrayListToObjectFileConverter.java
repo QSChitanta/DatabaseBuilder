@@ -9,14 +9,14 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 public class ArrayListToObjectFileConverter {
-    private final File databaseFile = new File("Client_Database.dat");
-    private ArrayList<Client> listOfClients = new ArrayList<>();
+    private static final File databaseFile = new File("Client_Database.dat");
+    private static ArrayList<Client> listOfClients = new ArrayList<>();
 
     /**
      * converts/serializes an ArrayList into a file for further usage
      * @throws IOException
      */
-    public void convertArrayListToFile() throws IOException {
+    public static void convertArrayListToFile() throws IOException {
         FileOutputStream file = new FileOutputStream(databaseFile);
         ObjectOutputStream newFile = new ObjectOutputStream(file);
         newFile.writeObject(listOfClients);

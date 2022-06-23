@@ -3,7 +3,7 @@ package de.quinscape.Database;
 import de.quinscape.FileInputConverter.ArrayListToObjectFileConverter;
 import de.quinscape.FileOutputConverter.ObjectFileToArrayListConverter;
 import de.quinscape.Model.Client;
-import de.quinscape.NavigationMenu.Menu;
+import de.quinscape.UserMenu.Menu;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,31 +11,21 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.util.Objects;
 import java.util.Scanner;
 
 /**
- * This class manages the database.
- * It creates or serializes, deserializes and saves a database file.
+ * It manages the Database
  */
-public class DatabaseManager {
+public class Manager {
     public ArrayList<Client> importedClientList = new ArrayList<>();
     private final File databaseFile = new File("Client_Database.dat");
-    static Scanner scanner = new Scanner(System.in);
-    static Menu menu = new Menu();
-    static String[] OPTIONS = {
-            "1- Show all clients",
-            "2- Show specific client",
-            "3- Add new client",
-            "4- Update existing client",
-            "5- Delete client",
-            "6- Exit"
-    };
+    private static final Menu menu = new Menu();
+
 
     public void runProgram() throws IOException, ClassNotFoundException {
         createOrReadFile();
-        chooseYourOption();
-        serializeClientList();
+        retrieveAndExecuteUserAction();
+        saveClients();
     }
 
     /**
@@ -46,77 +36,73 @@ public class DatabaseManager {
      * @throws ClassNotFoundException
      */
     private void createOrReadFile() throws IOException, ClassNotFoundException {
-        ArrayListToObjectFileConverter clientList = new ArrayListToObjectFileConverter();
+        ArrayListToObjectFileConverter arrayListToObjectFileConverter = new ArrayListToObjectFileConverter();
         ObjectFileToArrayListConverter objectFileToArrayListConverter = new ObjectFileToArrayListConverter();
         boolean doesFileExist = objectFileToArrayListConverter.databaseFile().exists();
         if (!doesFileExist) {
-            //creates .dat file
-            clientList.convertArrayListToFile();
+            arrayListToObjectFileConverter.convertArrayListToFile();
         } else {
-            //opens database as an ArrayList Object
-            deserializeClientList(objectFileToArrayListConverter);
+            readClientList(objectFileToArrayListConverter);
         }
     }
 
     /**
-     * opens the saved ArrayList from the File a
+     * opens the saved ArrayList from the File
      *
      * @param objectFileToArrayListConverter
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void deserializeClientList(ObjectFileToArrayListConverter objectFileToArrayListConverter) throws IOException, ClassNotFoundException {
+    public void readClientList(ObjectFileToArrayListConverter objectFileToArrayListConverter) throws IOException, ClassNotFoundException {
         importedClientList = objectFileToArrayListConverter.importClientArrayListFile();
     }
 
-    public void chooseYourOption() {
-        int option = 0;
+    public void retrieveAndExecuteUserAction() {
+        Scanner userInput = new Scanner(System.in);
+        int option = Menu.NO_SELECTION;
         while (option != 7) {
             printMenu();
             try {
-                option = scanner.nextInt();
+                option = userInput.nextInt();
                 switch (option) {
-                    case 1:
+                    case Menu.SHOW_ALL_CLIENTS:
                         showAllClients();
                         break;
-                    case 2:
-                        selectAndShowClient();
+                    case Menu.SHOW_SELECTED_CLIENT:
+                        findClientByName();
                         break;
-                    case 3:
+                    case Menu.ADD_NEW_CLIENT:
                         addNewClientToList();
                         break;
-                    case 4:
+                    case Menu.UPDATE_CLIENT:
                         updateClient();
                         break;
-                    case 5:
+                    case Menu.DELETE_CLIENT:
                         deleteClient();
                         break;
-                    case 6:
+                    case Menu.DELETE_ALL_CLIENTS:
                         deleteAllClients();
                         break;
-                    case 7:
+                    case Menu.END_PROGRAM:
                         System.out.println("Exiting...");
                         break;
                 }
             } catch (InputMismatchException i) {
-                System.out.println("Please enter an integer value between 1 and " + OPTIONS.length + " + Error Message: " + i.getMessage());
-                scanner.next();
+                System.out.println("Please enter an integer value between 1 and " + menu.printMenuOptions().length + " + Error Message: " + i.getMessage());
+                userInput.next();
             } catch (Exception e) {
                 System.out.println("Unexpected error. Please try again" + " + Error Message: " + e.getMessage() + ". Enter something to continue");
             }
         }
     }
 
-    public static void printMenu() {
+    public void printMenu() {
         for (String option : menu.printMenuOptions()) {
             System.out.println(option);
         }
         System.out.println("Choose your option: ");
     }
 
-    /**
-     * prints every element from list
-     */
     public void showAllClients() {
         for (Client client : importedClientList){
             System.out.println("Client-name: " + client.getName() + "\n" + "Client-insurance-number: " + client.getInsuranceNumber());
@@ -132,11 +118,10 @@ public class DatabaseManager {
         System.out.println("You have " + count + " entries");
     }
 
-    private void selectAndShowClient() {
-        System.out.println("Who are you looking for?: ");
+    private void findClientByName() {
+        System.out.println("Enter the name of the person you are looking for: ");
         Scanner userInput = new Scanner(System.in);
         String check = userInput.nextLine();
-        //TODO: diese for schleife in einer simpleren Form nachbauen
         for (Client client : importedClientList){
             if (check.equals(client.getName())){
                 System.out.println("Client-name: " + client.getName() + "\n" +
@@ -145,9 +130,6 @@ public class DatabaseManager {
         }
     }
 
-    /**
-     * creates a new Client object and adds it to the list of clients
-     */
     public void addNewClientToList() {
         Client client = new Client();
         Scanner userInput = new Scanner(System.in);
@@ -201,7 +183,7 @@ public class DatabaseManager {
      *
      * @throws IOException
      */
-    public void serializeClientList() throws IOException {
+    public void saveClients() throws IOException {
         FileOutputStream file = new FileOutputStream(databaseFile);
         ObjectOutputStream newFile = new ObjectOutputStream(file);
         newFile.writeObject(importedClientList);
