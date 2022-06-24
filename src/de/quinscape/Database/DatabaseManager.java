@@ -13,86 +13,78 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import static de.quinscape.UserMenu.Menu.*;
+
 /**
- * It manages the Database
+ * Constructs a bridge to the file based database and creates functions to
+ * append, update, search, read, update, delete and save clients to the ArrayList inside
  */
-public class Manager {
-    public ArrayList<Client> importedClientList = new ArrayList<>();
+public class DatabaseManager {
+    public ArrayList<Client> clientList = new ArrayList<>();
     private final File databaseFile = new File("Client_Database.dat");
     private static final Menu menu = new Menu();
 
 
     public void runProgram() throws IOException, ClassNotFoundException {
-        createOrReadFile();
-        retrieveAndExecuteUserAction();
+        createsOrReadsFileBasedDatabase();
+        loopThroughUserActionAndRetrieveExecutions();
         saveClients();
     }
 
-    /**
-     * Serializes an ArrayList to a "Client_Database.dat" file. If that file exists:
-     * 1) deserialize / open the file; 2) append new clients to its list,3) serialize, close and save the file
-     *
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    private void createOrReadFile() throws IOException, ClassNotFoundException {
-        ArrayListToObjectFileConverter arrayListToObjectFileConverter = new ArrayListToObjectFileConverter();
+    private void createsOrReadsFileBasedDatabase() throws IOException, ClassNotFoundException {
         ObjectFileToArrayListConverter objectFileToArrayListConverter = new ObjectFileToArrayListConverter();
         boolean doesFileExist = objectFileToArrayListConverter.databaseFile().exists();
         if (!doesFileExist) {
-            arrayListToObjectFileConverter.convertArrayListToFile();
+            ArrayListToObjectFileConverter.convertArrayListToFile();
         } else {
             readClientList(objectFileToArrayListConverter);
         }
     }
 
     /**
-     * opens the saved ArrayList from the File
-     *
+     * Reads all clients from database file
      * @param objectFileToArrayListConverter
      * @throws IOException
      * @throws ClassNotFoundException
      */
     public void readClientList(ObjectFileToArrayListConverter objectFileToArrayListConverter) throws IOException, ClassNotFoundException {
-        importedClientList = objectFileToArrayListConverter.importClientArrayListFile();
+        clientList = objectFileToArrayListConverter.importClientArrayListFile();
     }
 
-    public void retrieveAndExecuteUserAction() {
-        Scanner userInput = new Scanner(System.in);
-        int option = Menu.NO_SELECTION;
+    public void loopThroughUserActionAndRetrieveExecutions() {
+        Scanner userInteractionInput = new Scanner(System.in);
+        int option = NO_SELECTION;
         while (option != 7) {
             printMenu();
             try {
-                option = userInput.nextInt();
+                option = userInteractionInput.nextInt();
                 switch (option) {
-                    case Menu.SHOW_ALL_CLIENTS:
+                    case SHOW_ALL_CLIENTS:
                         showAllClients();
                         break;
-                    case Menu.SHOW_SELECTED_CLIENT:
-                        findClientByName();
+                    case SHOW_SELECTED_CLIENT:
+                        showClientByNameDialog();
                         break;
-                    case Menu.ADD_NEW_CLIENT:
-                        addNewClientToList();
+                    case ADD_NEW_CLIENT:
+                        showAddNewClientDialog();
                         break;
-                    case Menu.UPDATE_CLIENT:
-                        updateClient();
+                    case UPDATE_CLIENT:
+                        showUpdateClientDialog();
                         break;
-                    case Menu.DELETE_CLIENT:
-                        deleteClient();
+                    case DELETE_CLIENT:
+                        clearList();
                         break;
-                    case Menu.DELETE_ALL_CLIENTS:
+                    case DELETE_ALL_CLIENTS:
                         deleteAllClients();
                         break;
-                    case Menu.END_PROGRAM:
+                    case END_PROGRAM:
                         System.out.println("Exiting...");
                         break;
                 }
             } catch (InputMismatchException i) {
                 System.out.println("Please enter an integer value between 1 and " + menu.printMenuOptions().length + " + Error Message: " + i.getMessage());
-                userInput.next();
-            } catch (Exception e) {
-                System.out.println("Unexpected error. Please try again" + " + Error Message: " + e.getMessage() + ". Enter something to continue");
-            }
+                userInteractionInput.next();
+            } catch (Exception ignore) {}
         }
     }
 
@@ -104,47 +96,43 @@ public class Manager {
     }
 
     public void showAllClients() {
-        for (Client client : importedClientList){
+        for (Client client : clientList){
             System.out.println("Client-name: " + client.getName() + "\n" + "Client-insurance-number: " + client.getInsuranceNumber());
         }
-        showEntryAmount();
+        System.out.println("You have " + clientList.size() + "entries");
     }
 
-    private void showEntryAmount() {
-        int count = 0;
-        for (int i = 0; i < importedClientList.size(); i++) {
-            count++;
-        }
-        System.out.println("You have " + count + " entries");
-    }
-
-    private void findClientByName() {
+    private void showClientByNameDialog() {
         System.out.println("Enter the name of the person you are looking for: ");
         Scanner userInput = new Scanner(System.in);
         String check = userInput.nextLine();
-        for (Client client : importedClientList){
-            if (check.equals(client.getName())){
+        findByName(check);
+    }
+
+    private void findByName(String searchedName) {
+        for (Client client : clientList){
+            if (searchedName.equals(client.getName())){
                 System.out.println("Client-name: " + client.getName() + "\n" +
                         "Client-insurance-number: " + client.getInsuranceNumber());
             }
         }
     }
 
-    public void addNewClientToList() {
+    public void showAddNewClientDialog() {
         Client client = new Client();
         Scanner userInput = new Scanner(System.in);
         System.out.println("Enter clients name: ");
         client.setName(userInput.nextLine());
         System.out.println("Enter clients insurance number: ");
         client.setInsuranceNumber(userInput.nextInt());
-        importedClientList.add(client);
+        clientList.add(client);
     }
 
-    private void updateClient() {
+    private void showUpdateClientDialog() {
         System.out.println("Whose information do you want to update? Enter name please: ");
         Scanner userInput = new Scanner(System.in);
         String searchForThisName = userInput.nextLine();
-        for (Client client : importedClientList) {
+        for (Client client : clientList) {
             if (searchForThisName.equals(client.getName())) {
                 System.out.println("Enter clients new name: ");
                 client.setName(userInput.nextLine());
@@ -155,26 +143,21 @@ public class Manager {
         }
     }
 
-    private void deleteClient() {
+    private void clearList() {
         System.out.println("Enter name to delete client: ");
 
         Scanner userInput = new Scanner(System.in);
         String clientToBeDeleted = userInput.nextLine();
-
-        for (Client client : importedClientList) {
+        for (Client client : clientList) {
             if (clientToBeDeleted.equals(client.getName())) {
-                importedClientList.remove(client);
+                clientList.remove(client);
                 System.out.println("Client has been deleted");
-                if (importedClientList.isEmpty()){
-                    System.out.println("Client list is now empty.");
-                    break;
-                }
             }
         }
     }
 
     private void deleteAllClients(){
-        importedClientList.removeAll(importedClientList);
+        clientList.clear();
         System.out.println("All clients have been deleted");
     }
 
@@ -186,7 +169,7 @@ public class Manager {
     public void saveClients() throws IOException {
         FileOutputStream file = new FileOutputStream(databaseFile);
         ObjectOutputStream newFile = new ObjectOutputStream(file);
-        newFile.writeObject(importedClientList);
+        newFile.writeObject(clientList);
         newFile.close();
         file.close();
     }
